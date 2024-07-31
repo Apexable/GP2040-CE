@@ -43,6 +43,7 @@
 // USB Input Class Drivers
 #include "drivermanager.h"
 
+extern volatile uint8_t SeparationLeftRight;
 static const uint32_t REBOOT_HOTKEY_ACTIVATION_TIME_MS = 50;
 static const uint32_t REBOOT_HOTKEY_HOLD_TIME_MS = 4000;
 
@@ -200,6 +201,36 @@ void GP2040::initializeStandardGpio() {
 			buttonGpios |= 1 << pin;    // mark this pin as mattering for GPIO debouncing
 		}
 	}
+
+	SeparationLeftRight = SEPARATION_LEFT_RIGHT;
+	if(SeparationLeftRight != 0)
+	{	/* ██████████████████████████████████████████████████████████████████████████████
+    // In the left-right split setting, use the 74HC165 for IO expansion to read left-handed buttons;
+		// 74HC165 control pins: PL=IO26 output, CP=IO22 output, Q7=IO14 input;
+		// ██████████████████████████████████████████████████████████████████████████████*/
+		gpio_init(HC165_OUT_Q7);             // Initialize pin
+		gpio_set_dir(HC165_OUT_Q7, GPIO_IN); // Set as INPUT=74HC165-Q7
+		gpio_pull_up(HC165_OUT_Q7);          // Set as PULLUP
+		
+		gpio_init(HC165_CP);             		// Initialize pin
+		gpio_set_dir(HC165_CP, GPIO_OUT); 	// Set as INPUT=74HC165-CP
+		gpio_init(HC165_nPL);             	// Initialize pin
+		gpio_set_dir(HC165_nPL, GPIO_OUT); 	// Set as INPUT=74HC165-PL
+		
+		gpio_put(HC165_CP, 0);
+		gpio_put(HC165_nPL, 1);
+		/* ██████████████████████████████████████████████████████████████████████████████*/
+	}
+	else
+	{	/* ██████████████████████████████████████████████████████████████████████████████
+		// Added the race lock key GPIO22, when GPIO22=0, the button HOME, +, - , L3, R3, has no action;
+		// ██████████████████████████████████████████████████████████████████████████████*/
+		gpio_init(22);             // Initialize pin
+		gpio_set_dir(22, GPIO_IN); // Set as INPUT
+		gpio_pull_up(22);          // Set as PULLUP
+	}
+
+	
 }
 
 /**
