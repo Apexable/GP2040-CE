@@ -115,12 +115,17 @@
 // Keyboard Host enabled by default
 #define KEYBOARD_HOST_ENABLED 1
 
-
-#define RACE_LOCK_KEY 22
-
 // #define BOARD_LED_ENABLED 1
 // #define BOARD_LED_TYPE ON_BOARD_LED_MODE_MODE_INDICATOR
-// SEPARATION_LEFT_RIGHT非0指示左和右是分离设计，需要用扩展线连接;
+
+//------------------------------------------------------------------------------
+// Added the race lock key RACE_LOCK_KEY=GPIO22, 
+// when GPIO22=0, the button HOME, +, - , L3, R3, has no action;
+#define RACE_LOCK_KEY 22
+
+// SEPARATION_LEFT_RIGHT!=0=left-right split setting;
+// In the left-right split setting, use the 74HC165 for IO expansion to read left-handed buttons;
+// 74HC165 control pins: PL=IO26 output, CP=IO22 output, Q7=IO14 input;
 #define SEPARATION_LEFT_RIGHT 55
 #define HC165_OUT_Q7 14
 #define HC165_CP 22
